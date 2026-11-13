@@ -12,7 +12,7 @@ class Cache:
         self.acessos = 0
         self.hits = 0
         self.misses_compulsorios = 0
-        self.misses_capacidade = 0
+        self.misses_capacidade_conflito = 0
         
         self.historico_blocos = set()
         
@@ -31,13 +31,15 @@ class Cache:
 
         bloco_id = endereco >> self.n_bits_offset
 
-        if conjunto_alvo.busca():
+        if conjunto_alvo.busca(tag):
             self.hits += 1
+            return True
         else:
             if bloco_id in self.historico_blocos:
-                self.misses_capacidade += 1
+                self.misses_capacidade_conflito += 1
             else:
                 self.misses_compulsorios += 1
                 self.historico_blocos.add(bloco_id)
-                
-        conjunto_alvo.insercao(tag)
+            conjunto_alvo.insercao(tag)
+            return False
+            
